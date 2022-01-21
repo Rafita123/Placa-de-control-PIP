@@ -125,7 +125,7 @@ uint8_t overflow = 0; // Cantidad de desbordes del timer
 float deltaTicks = 0;
 uint8_t ranuras = 50;
 uint16_t cantTicksTmr2 = 50000;
-uint16_t tickFilter = 10000;
+uint16_t tickFilter = 12500;
 float fsTmr2= 1000000;
 float mean [50] = {'\0'};
 float resultMean = 0;
@@ -161,8 +161,10 @@ float moveMean(float *arr, float vel){
 // Si se interrumpe por flanco ascendente del pin 0 (Enconder optico)
 void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
 	if (GPIO_Pin == D01_Encoder_Pin){
+		uint32_t ticksAux = 0;
 		interrupciones = interrupciones + 1;
 //		incremento_enconder += 1;
+		ticksAux = ticksPrev;
 		ticksPrev = ticksNow;
 		ticksNow = __HAL_TIM_GetCounter(&htim2);
 
@@ -174,9 +176,10 @@ void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
 //			resultMean = moveMean(mean,velocidad);
 			resultMean = velocidad;
 			}
-//			else{
-//				ticksNow = ticksPrev;
-//			}
+			else{
+				ticksNow = ticksPrev;
+				ticksPrev = ticksAux;
+			}
 		} else{
 			// Tuve algun desborde y tengo que tenerlo en cuenta
 			deltaTicks = (ticksNow + overflow * cantTicksTmr2)- ticksPrev;
@@ -186,9 +189,10 @@ void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
 				resultMean = velocidad;
 				overflow = 0;
 			}
-//			else{
-//				ticksNow = ticksPrev;
-//			}
+			else{
+				ticksNow = ticksPrev;
+				ticksPrev = ticksAux;
+			}
 		}
 
 		if(deltaTicks == 0){
@@ -806,7 +810,7 @@ void StartEncoders(void *argument)
     osDelay(Ts);// Delta T
     Sentido(ModbusDATA[0]);
 
-    memcpy(meanData, &resultMean, sizeof(resultMean));
+    memcpy(meanData, &ticksNow, sizeof(ticksNow));
     ModbusDATA[4]=meanData[0];
     ModbusDATA[5]=meanData[1];
 
