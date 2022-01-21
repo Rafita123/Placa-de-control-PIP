@@ -112,7 +112,8 @@ void StartControl(void *argument);
 /* USER CODE BEGIN 0 */
 //---------------->  Modbus
 modbusHandler_t ModbusH;
-uint16_t ModbusDATA[13]={1,0,0,0,0,0,0,0,0,0,0,0,0}; // Mapa modbus!
+uint16_t ModbusDATA[13]={1,5000,0,0,0,0,0,0,0,0,0,0,0}; // Mapa modbus!
+//uint16_t ModbusDATA[3]={0,0,0};
 //---------------->
 uint32_t Ts =100; // En ms!
 
@@ -121,35 +122,75 @@ uint32_t Ts =100; // En ms!
 float velocidad = 0;
 uint32_t ticksPrev = 0;
 uint32_t ticksNow = 0;
-uint8_t overflow = 0; // Cantidad de desbordes del timer
-float deltaTicks = 0;
-uint8_t ranuras = 50;
-uint16_t cantTicksTmr2 = 50000;
-uint16_t tickFilter = 10000;
-float fsTmr2= 1000000;
-float mean [50] = {'\0'};
+uint32_t overflow = 0; // Cantidad de desbordes del timer
+uint32_t deltaTicks = 0;
+uint32_t ranuras = 50;
+uint32_t cantTicksTmr2 = 50000;
+uint32_t tickFilter = 0;
+float fsTmr2= 500000;
+float mean [40] = {'\0'};
+uint16_t mean_ADC[50]={'\0'};
 float resultMean = 0;
-uint16_t interrupciones=0;
+float resultMeanADC=0;
+uint16_t result1=0;
+float offset1= 1.572;
+float R1=989.0;
+float R2=1958.0;
+float gain = 0.6637450199203187;
+
+
+uint32_t counter = 0;
+
+
+//uint16_t adc1=1000;
 
 //----------------
 
-float moveMean(float *arr, float vel){
+float moveMean(float vel){
 	// Vector de desplazamiento
-	for (uint16_t i = 1; i < sizeof(arr); ++i) {
-		arr[i-1]=arr[i];
+	size_t n = sizeof(mean)/sizeof(mean[0]);
+
+	for (int i = 1; i < n; ++i) {
+		mean[i-1]=mean[i];
 	}
-	arr[sizeof(arr)-1] = vel;
+	mean[n-1] = vel;
 
 	// Ahora aplico el filtro
 	float result = 0;
-	for (int i = 0; i < sizeof(arr); ++i) {
-		result += arr[i];
+	for (int i = 0; i <= n; ++i) {
+		result += mean[i];
 	}
-	result = result/((float)sizeof(arr));
+	result = result/((float)n);
 	return result;
 }
 
 
+float moveMeanADC(uint16_t ADC){
+	// Vector de desplazamiento
+	uint32_t result = 0;
+	size_t n = sizeof(mean_ADC)/sizeof(mean_ADC[0]);
+	float valor = 0;
+
+	for (int i = 1; i < n; ++i) {
+		mean_ADC[i-1]=mean_ADC[i];
+	}
+	if(ADC >4095){
+		ADC=0;
+	}
+	mean_ADC[n-1] = ADC;
+
+	// Ahora aplico el filtro
+
+	for (int i = 0; i < n; ++i) {
+		result += mean_ADC[i];
+	}
+	valor = (float)result/(float)n;
+	result1 = result/(n);
+
+	//No se divide por 4095 porque el adc anda como tiene ganas
+	valor = (valor*3.3)/(4035.0*gain);
+	return valor;
+}
 
 
 
@@ -160,9 +201,11 @@ float moveMean(float *arr, float vel){
 
 // Si se interrumpe por flanco ascendente del pin 0 (Enconder optico)
 void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
-	if (GPIO_Pin == D01_Encoder_Pin){
-		interrupciones = interrupciones + 1;
-//		incremento_enconder += 1;
+
+	uint32_t ticksAux = 0;
+	if (GPIO_Pin == D02_Encoder_Pin){
+		counter ++;
+		ticksAux = ticksPrev;
 		ticksPrev = ticksNow;
 		ticksNow = __HAL_TIM_GetCounter(&htim2);
 
@@ -171,28 +214,28 @@ void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
 			deltaTicks = ticksNow - ticksPrev;
 			if (deltaTicks > tickFilter){
 			velocidad = ((float)1/(float)ranuras)/(((float)deltaTicks)/(float)(fsTmr2));
-//			resultMean = moveMean(mean,velocidad);
-			resultMean = velocidad;
+			resultMean = moveMean(velocidad);
 			}
-//			else{
-//				ticksNow = ticksPrev;
-//			}
+			else{
+				ticksPrev = ticksAux;
+			}
 		} else{
 			// Tuve algun desborde y tengo que tenerlo en cuenta
-			deltaTicks = (ticksNow + overflow * cantTicksTmr2)- ticksPrev;
-			if (deltaTicks > tickFilter){
+//			deltaTicks = (ticksNow + (uint32_t)overflow * (uint32_t)cantTicksTmr2)- ticksPrev;
+
+			deltaTicks = ticksNow + overflow * cantTicksTmr2 - ticksPrev;
+			if (deltaTicks > tickFilter ){
 				velocidad = ((float)1/(float)ranuras)/(((float)deltaTicks)/(float)(fsTmr2));
-//				resultMean = moveMean(mean,velocidad);
-				resultMean = velocidad;
+				resultMean = moveMean(velocidad);
 				overflow = 0;
 			}
-//			else{
-//				ticksNow = ticksPrev;
-//			}
+			else{
+				ticksPrev = ticksAux;
+			}
 		}
 
 		if(deltaTicks == 0){
-			velocidad = 0;
+			velocidad = 3.14;
 	 }
 	}
 
@@ -443,6 +486,7 @@ static void MX_ADC1_Init(void)
   }
   /** Configure Regular Channel
   */
+  sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = ADC_REGULAR_RANK_2;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
@@ -450,6 +494,7 @@ static void MX_ADC1_Init(void)
   }
   /** Configure Regular Channel
   */
+  sConfig.Channel = ADC_CHANNEL_2;
   sConfig.Rank = ADC_REGULAR_RANK_3;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
@@ -457,6 +502,7 @@ static void MX_ADC1_Init(void)
   }
   /** Configure Regular Channel
   */
+  sConfig.Channel = ADC_CHANNEL_3;
   sConfig.Rank = ADC_REGULAR_RANK_4;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
@@ -574,11 +620,11 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 72-1;
+  htim2.Init.Prescaler = 144-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 50000-1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
   {
     Error_Handler();
@@ -697,11 +743,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : D01_Encoder_Pin D02_Encoder_Pin D03_Encoder_Pin D04_Encoder_Pin */
-  GPIO_InitStruct.Pin = D01_Encoder_Pin|D02_Encoder_Pin|D03_Encoder_Pin|D04_Encoder_Pin;
+  /*Configure GPIO pin : D02_Encoder_Pin */
+  GPIO_InitStruct.Pin = D02_Encoder_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(D02_Encoder_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
@@ -741,6 +787,7 @@ void StartModbus(void *argument)
 	vPortFree(prt);
 	      ; // process data
 	    }
+	    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 
     osDelay(900);
 //    ModbusDATA[5]= ++i;
@@ -760,20 +807,28 @@ void StartADC(void *argument)
 {
   /* USER CODE BEGIN StartADC */
 
-//	uint16_t adc1[4];
-//	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1,sizeof (adc1));
-//	HAL_ADC_Start_DMA(hadc, pData, Length)
+	uint16_t adc1[4];
+	uint16_t delta[2];
+	//HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1,sizeof (adc1));
+
   /* Infinite loop */
   for(;;)
   {
+
 //	HAL_ADC_Stop_DMA(&hadc1);
+//
+//	resultMeanADC = moveMeanADC(adc1[]]);
+//    memcpy(delta, &resultMeanADC, sizeof(resultMeanADC));
+//    ModbusDATA[0]=delta[0];
+//    ModbusDATA[1]=delta[1];
+//    ModbusDATA[2]=adc1[0];
 //	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1,sizeof (adc1));
-//	adc1 = HAL_ADC_PollForConversion(&hadc1, 5000);
 //	osMessageQueuePut(QueueDataADCHandle, &adc1, 5000);
 //	osMessageQueuePut(QueueDataADCHandle, &adc1[0], NULL, 5000);
 //	osThreadYield();
 
-    osDelay(1000);
+    osDelay(100);
+
   }
   /* USER CODE END StartADC */
 }
@@ -802,7 +857,7 @@ void StartEncoders(void *argument)
   for(;;)
   {
 
-//    Velocidad(ModbusDATA[0]);// Calculo la velocidad para devolver por modbus
+    //Velocidad(ModbusDATA[0]);// Calculo la velocidad para devolver por modbus
     osDelay(Ts);// Delta T
     Sentido(ModbusDATA[0]);
 
@@ -821,7 +876,7 @@ void StartEncoders(void *argument)
 
     htim1.Instance->CCR1 = ModbusDATA[1];
 
-    ModbusDATA[6] = overflow;
+//    ModbusDATA[6] = overflow;
     if(overflow >= 2){
     	  velocidad = 0;
     	  overflow = 0;
@@ -904,4 +959,3 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

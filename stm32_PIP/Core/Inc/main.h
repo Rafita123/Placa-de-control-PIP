@@ -86,18 +86,9 @@ void Error_Handler(void);
 #define OUT3_2_GPIO_Port GPIOB
 #define OUT3_1_Pin GPIO_PIN_4
 #define OUT3_1_GPIO_Port GPIOB
-#define D01_Encoder_Pin GPIO_PIN_6
-#define D01_Encoder_GPIO_Port GPIOB
-#define D01_Encoder_EXTI_IRQn EXTI9_5_IRQn
 #define D02_Encoder_Pin GPIO_PIN_7
 #define D02_Encoder_GPIO_Port GPIOB
 #define D02_Encoder_EXTI_IRQn EXTI9_5_IRQn
-#define D03_Encoder_Pin GPIO_PIN_8
-#define D03_Encoder_GPIO_Port GPIOB
-#define D03_Encoder_EXTI_IRQn EXTI9_5_IRQn
-#define D04_Encoder_Pin GPIO_PIN_9
-#define D04_Encoder_GPIO_Port GPIOB
-#define D04_Encoder_EXTI_IRQn EXTI9_5_IRQn
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -107,5 +98,3 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
