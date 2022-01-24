@@ -126,7 +126,7 @@ uint8_t overflow = 0; // Cantidad de desbordes del timer
 float deltaTicks = 0;
 uint8_t ranuras = 50;
 uint16_t cantTicksTmr2 = 50000;
-uint16_t tickFilter = 625;
+float tickFilter = 625;
 float fsTmr2= 50000;
 float mean [50] = {'\0'};
 float resultMean = 0;
@@ -178,7 +178,7 @@ void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
 			//velocidad_prima1(k)=0.9 velocidad_prima2(k-1)+0.1 velocidad(k)
 
 			velocidad_prima2 = velocidad_prima1;
-			velocidad_prima1 = 0.9*velocidad_prima2 + 0.1*velocidad;
+			velocidad_prima1 = 0.75*velocidad_prima2 + 0.25*velocidad;
 
 //			resultMean = moveMean(mean,velocidad);
 			resultMean = velocidad;
@@ -191,10 +191,10 @@ void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
 			// Tuve algun desborde y tengo que tenerlo en cuenta
 			deltaTicks = (ticksNow + overflow * cantTicksTmr2)- ticksPrev;
 			if (deltaTicks > tickFilter){
-				velocidad = ((float)1/(float)ranuras)/(((float)deltaTicks)/(float)(fsTmr2));
+				velocidad = ((float)1/(float)ranuras)/((deltaTicks)/(fsTmr2));
 				//T_actual(k)=0.9 T_actual(k-1)+0.1 T_medido(k)
 				velocidad_prima2 = velocidad_prima1;
-				velocidad_prima1 = 0.9*velocidad_prima2 + 0.1*velocidad;
+				velocidad_prima1 = 0.75*velocidad_prima2 + 0.25*velocidad;
 //				resultMean = moveMean(mean,velocidad);
 				resultMean = velocidad;
 				overflow = 0;
@@ -711,14 +711,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : D01_Encoder_Pin */
-  GPIO_InitStruct.Pin = D01_Encoder_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(D01_Encoder_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : D02_Encoder_Pin D03_Encoder_Pin D04_Encoder_Pin */
-  GPIO_InitStruct.Pin = D02_Encoder_Pin|D03_Encoder_Pin|D04_Encoder_Pin;
+  /*Configure GPIO pins : D01_Encoder_Pin D02_Encoder_Pin D03_Encoder_Pin D04_Encoder_Pin */
+  GPIO_InitStruct.Pin = D01_Encoder_Pin|D02_Encoder_Pin|D03_Encoder_Pin|D04_Encoder_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
