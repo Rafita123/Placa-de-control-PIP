@@ -119,14 +119,15 @@ uint32_t Ts =100; // En ms!
 
 //---------------->  Variables para calcular velocidad
 float velocidad = 0;
+float velocidad_prima1,velocidad_prima2;
 uint32_t ticksPrev = 0;
 uint32_t ticksNow = 0;
 uint8_t overflow = 0; // Cantidad de desbordes del timer
 float deltaTicks = 0;
 uint8_t ranuras = 50;
 uint16_t cantTicksTmr2 = 50000;
-uint16_t tickFilter = 12500;
-float fsTmr2= 1000000;
+uint16_t tickFilter = 625;
+float fsTmr2= 50000;
 float mean [50] = {'\0'};
 float resultMean = 0;
 uint16_t interrupciones=0;
@@ -173,6 +174,12 @@ void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
 			deltaTicks = ticksNow - ticksPrev;
 			if (deltaTicks > tickFilter){
 			velocidad = ((float)1/(float)ranuras)/(((float)deltaTicks)/(float)(fsTmr2));
+
+			//velocidad_prima1(k)=0.9 velocidad_prima2(k-1)+0.1 velocidad(k)
+
+			velocidad_prima2 = velocidad_prima1;
+			velocidad_prima1 = 0.9*velocidad_prima2 + 0.1*velocidad;
+
 //			resultMean = moveMean(mean,velocidad);
 			resultMean = velocidad;
 			}
@@ -185,6 +192,9 @@ void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
 			deltaTicks = (ticksNow + overflow * cantTicksTmr2)- ticksPrev;
 			if (deltaTicks > tickFilter){
 				velocidad = ((float)1/(float)ranuras)/(((float)deltaTicks)/(float)(fsTmr2));
+				//T_actual(k)=0.9 T_actual(k-1)+0.1 T_medido(k)
+				velocidad_prima2 = velocidad_prima1;
+				velocidad_prima1 = 0.9*velocidad_prima2 + 0.1*velocidad;
 //				resultMean = moveMean(mean,velocidad);
 				resultMean = velocidad;
 				overflow = 0;
@@ -578,11 +588,11 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 72-1;
+  htim2.Init.Prescaler = 1440-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 50000-1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
   {
     Error_Handler();
@@ -701,10 +711,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : D01_Encoder_Pin D02_Encoder_Pin D03_Encoder_Pin D04_Encoder_Pin */
-  GPIO_InitStruct.Pin = D01_Encoder_Pin|D02_Encoder_Pin|D03_Encoder_Pin|D04_Encoder_Pin;
+  /*Configure GPIO pin : D01_Encoder_Pin */
+  GPIO_InitStruct.Pin = D01_Encoder_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(D01_Encoder_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : D02_Encoder_Pin D03_Encoder_Pin D04_Encoder_Pin */
+  GPIO_InitStruct.Pin = D02_Encoder_Pin|D03_Encoder_Pin|D04_Encoder_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
@@ -810,16 +826,16 @@ void StartEncoders(void *argument)
     osDelay(Ts);// Delta T
     Sentido(ModbusDATA[0]);
 
-    memcpy(meanData, &ticksNow, sizeof(ticksNow));
+    memcpy(meanData, &deltaTicks, sizeof(deltaTicks));
     ModbusDATA[4]=meanData[0];
     ModbusDATA[5]=meanData[1];
 
 
-    memcpy(pasador, &velocidad, sizeof(velocidad));
+    memcpy(pasador, &velocidad_prima1, sizeof(velocidad_prima1));
     ModbusDATA[8]=pasador[0];
     ModbusDATA[9]=pasador[1];
 
-    memcpy(delta, &deltaTicks, sizeof(deltaTicks));
+    memcpy(delta, &velocidad, sizeof(velocidad));
     ModbusDATA[10]=delta[0];
     ModbusDATA[11]=delta[1];
 
@@ -828,7 +844,7 @@ void StartEncoders(void *argument)
     ModbusDATA[6] = overflow;
     if(overflow >= 2){
     	  velocidad = 0;
-    	  overflow = 0;
+    	  //overflow = 0;
       }
 
   }
@@ -908,4 +924,3 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
