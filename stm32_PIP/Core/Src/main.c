@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -122,33 +122,33 @@ float velocidad = 0;
 float velocidad_prima1,velocidad_prima2;
 uint32_t ticksPrev = 0;
 uint32_t ticksNow = 0;
-uint8_t overflow = 0; // Cantidad de desbordes del timer
-float deltaTicks = 0;
-uint8_t ranuras = 50;
-uint16_t cantTicksTmr2 = 50000;
-float tickFilter = 625;
-float fsTmr2= 50000;
+uint32_t overflow = 0; // Cantidad de desbordes del timer
+uint64_t deltaTicks = 0;
+uint32_t ranuras = 50;
+uint32_t cantTicksTmr2 = 60000;
+uint64_t fsTmr2= 50000;
+uint64_t tickFilter = 625;
 float mean [50] = {'\0'};
 float resultMean = 0;
 uint16_t interrupciones=0;
 
 //----------------
 
-float moveMean(float *arr, float vel){
-	// Vector de desplazamiento
-	for (uint16_t i = 1; i < sizeof(arr); ++i) {
-		arr[i-1]=arr[i];
-	}
-	arr[sizeof(arr)-1] = vel;
-
-	// Ahora aplico el filtro
-	float result = 0;
-	for (int i = 0; i < sizeof(arr); ++i) {
-		result += arr[i];
-	}
-	result = result/((float)sizeof(arr));
-	return result;
-}
+//float moveMean(float *arr, float vel){
+//	// Vector de desplazamiento
+//	for (uint16_t i = 1; i < sizeof(arr); ++i) {
+//		arr[i-1]=arr[i];
+//	}
+//	arr[sizeof(arr)-1] = vel;
+//
+//	// Ahora aplico el filtro
+//	float result = 0;
+//	for (int i = 0; i < sizeof(arr); ++i) {
+//		result += arr[i];
+//	}
+//	result = result/((float)sizeof(arr));
+//	return result;
+//}
 
 
 
@@ -163,25 +163,19 @@ float moveMean(float *arr, float vel){
 void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
 	if (GPIO_Pin == D01_Encoder_Pin){
 		uint32_t ticksAux = 0;
-		interrupciones = interrupciones + 1;
-//		incremento_enconder += 1;
 		ticksAux = ticksPrev;
 		ticksPrev = ticksNow;
 		ticksNow = __HAL_TIM_GetCounter(&htim2);
 
-		 if (overflow == 0){
+		if (overflow == 0){
 			// Todo cool, calculo normal
-			deltaTicks = ticksNow - ticksPrev;
+			deltaTicks = (uint64_t)(ticksNow - ticksPrev);
 			if (deltaTicks > tickFilter){
-			velocidad = ((float)1/(float)ranuras)/(((float)deltaTicks)/(float)(fsTmr2));
+				velocidad = ((1/(float)ranuras)/((float)deltaTicks/(float)fsTmr2));
 
-			//velocidad_prima1(k)=0.9 velocidad_prima2(k-1)+0.1 velocidad(k)
-
-			velocidad_prima2 = velocidad_prima1;
-			velocidad_prima1 = 0.75*velocidad_prima2 + 0.25*velocidad;
-
-//			resultMean = moveMean(mean,velocidad);
-			resultMean = velocidad;
+				//Filtro IIR
+				velocidad_prima2 = velocidad_prima1;
+				velocidad_prima1 = 0.9*velocidad_prima2 + 0.1*velocidad;
 			}
 			else{
 				ticksNow = ticksPrev;
@@ -189,14 +183,14 @@ void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
 			}
 		} else{
 			// Tuve algun desborde y tengo que tenerlo en cuenta
-			deltaTicks = (ticksNow + overflow * cantTicksTmr2)- ticksPrev;
+			deltaTicks = (uint64_t)(ticksNow + overflow * cantTicksTmr2)- ticksPrev;
 			if (deltaTicks > tickFilter){
-				velocidad = ((float)1/(float)ranuras)/((deltaTicks)/(fsTmr2));
-				//T_actual(k)=0.9 T_actual(k-1)+0.1 T_medido(k)
+				velocidad = ((1/(float)ranuras)/((float)deltaTicks/(float)fsTmr2));
+
+				//Filtro IIR
 				velocidad_prima2 = velocidad_prima1;
-				velocidad_prima1 = 0.75*velocidad_prima2 + 0.25*velocidad;
-//				resultMean = moveMean(mean,velocidad);
-				resultMean = velocidad;
+				velocidad_prima1 = 0.9*velocidad_prima2 + 0.1*velocidad;
+
 				overflow = 0;
 			}
 			else{
@@ -205,9 +199,10 @@ void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin){
 			}
 		}
 
-		if(deltaTicks == 0){
-			velocidad = 0;
-	 }
+		//		if(deltaTicks == 0){
+		//			velocidad = 0;
+		//
+		//	 }
 	}
 
 }
@@ -284,37 +279,37 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
-  // Definiciones para la biblioteca de modbus
-   ModbusH.uModbusType = MB_SLAVE;
-   ModbusH.port =  &huart3;
-   ModbusH.u8id = 1; //Modbus slave ID
-   ModbusH.u16timeOut = 1000;
-   ModbusH.EN_Port = NULL;
-   ModbusH.u16regs = ModbusDATA;
-   ModbusH.u16regsize= sizeof(ModbusDATA)/sizeof(ModbusDATA[0]);
-   ModbusH.xTypeHW = USART_HW;
+	// Definiciones para la biblioteca de modbus
+	ModbusH.uModbusType = MB_SLAVE;
+	ModbusH.port =  &huart3;
+	ModbusH.u8id = 1; //Modbus slave ID
+	ModbusH.u16timeOut = 1000;
+	ModbusH.EN_Port = NULL;
+	ModbusH.u16regs = ModbusDATA;
+	ModbusH.u16regsize= sizeof(ModbusDATA)/sizeof(ModbusDATA[0]);
+	ModbusH.xTypeHW = USART_HW;
 
-   //Initialize Modbus library
-   ModbusInit(&ModbusH);
-   //Start capturing traffic on serial Port
-   ModbusStart(&ModbusH);
+	//Initialize Modbus library
+	ModbusInit(&ModbusH);
+	//Start capturing traffic on serial Port
+	ModbusStart(&ModbusH);
 
-   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   /* USER CODE END 2 */
 
   /* Init scheduler */
   osKernelInitialize();
 
   /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
+	/* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
+	/* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
+	/* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the queue(s) */
@@ -322,17 +317,17 @@ int main(void)
   QueueDataADCHandle = osMessageQueueNew (16, sizeof(uint16_t), &QueueDataADC_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-//  if ( QueueDataADCHandle == 0)  // Queue not created
-//  {
-//	  char *str = "Unable to create Integer Queue\n\n";
-////	  HAL_UART_Transmit(&huart3, (uint8_t *)str, strlen (str), HAL_MAX_DELAY);
-//  }
-//  else
-//  {
-//	  char *str = "Integer Queue Created successfully\n\n";
-////	  HAL_UART_Transmit(&huart3, (uint8_t *)str, strlen (str), HAL_MAX_DELAY);
-//  }
+	/* add queues, ... */
+	//  if ( QueueDataADCHandle == 0)  // Queue not created
+	//  {
+	//	  char *str = "Unable to create Integer Queue\n\n";
+	////	  HAL_UART_Transmit(&huart3, (uint8_t *)str, strlen (str), HAL_MAX_DELAY);
+	//  }
+	//  else
+	//  {
+	//	  char *str = "Integer Queue Created successfully\n\n";
+	////	  HAL_UART_Transmit(&huart3, (uint8_t *)str, strlen (str), HAL_MAX_DELAY);
+	//  }
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -349,11 +344,11 @@ int main(void)
   ControlHandle = osThreadNew(StartControl, NULL, &Control_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+	/* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
-  /* add events, ... */
+	/* add events, ... */
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
@@ -362,12 +357,12 @@ int main(void)
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+	while (1)
+	{
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+	}
   /* USER CODE END 3 */
 }
 
@@ -590,7 +585,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 1440-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 50000-1;
+  htim2.Init.Period = 60000-1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -729,75 +724,75 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN Header_StartModbus */
 /**
-  * @brief  Function implementing the Modbus thread.
-  * @param  argument: Not used
-  * @retval None
-  */
+ * @brief  Function implementing the Modbus thread.
+ * @param  argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartModbus */
 void StartModbus(void *argument)
 {
   /* USER CODE BEGIN 5 */
-//	int i =0;
-//	char buff[64];
+	//	int i =0;
+	//	char buff[64];
 	uint16_t valor =1234;
 	char *prt;
 	osStatus_t status;
-  /* Infinite loop */
-  for(;;)
-  {
-//	  osMessageGet( QueueDataADCHandle, &valor, 0 );
-	prt=pvPortMalloc(100*sizeof (char));
-	sprintf(prt,"Dato leido de la Queue: %u \n",valor);
+	/* Infinite loop */
+	for(;;)
+	{
+		//	  osMessageGet( QueueDataADCHandle, &valor, 0 );
+		prt=pvPortMalloc(100*sizeof (char));
+		sprintf(prt,"Dato leido de la Queue: %u \n",valor);
 
-	 status = osMessageQueueGet(QueueDataADCHandle, &valor, NULL, 5000);   // wait for message
-	    if (status == osOK) {
-//	HAL_UART_Transmit(&huart3, (uint8_t*)prt, strlen(prt), 100);
-	vPortFree(prt);
-	      ; // process data
-	    }
+		status = osMessageQueueGet(QueueDataADCHandle, &valor, NULL, 5000);   // wait for message
+		if (status == osOK) {
+			//	HAL_UART_Transmit(&huart3, (uint8_t*)prt, strlen(prt), 100);
+			vPortFree(prt);
+			; // process data
+		}
 
-    osDelay(900);
-//    ModbusDATA[5]= ++i;
+		osDelay(900);
+		//    ModbusDATA[5]= ++i;
 
-  }
+	}
   /* USER CODE END 5 */
 }
 
 /* USER CODE BEGIN Header_StartADC */
 /**
-* @brief Function implementing the ADC thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the ADC thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartADC */
 void StartADC(void *argument)
 {
   /* USER CODE BEGIN StartADC */
 
-//	uint16_t adc1[4];
-//	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1,sizeof (adc1));
-//	HAL_ADC_Start_DMA(hadc, pData, Length)
-  /* Infinite loop */
-  for(;;)
-  {
-//	HAL_ADC_Stop_DMA(&hadc1);
-//	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1,sizeof (adc1));
-//	adc1 = HAL_ADC_PollForConversion(&hadc1, 5000);
-//	osMessageQueuePut(QueueDataADCHandle, &adc1, 5000);
-//	osMessageQueuePut(QueueDataADCHandle, &adc1[0], NULL, 5000);
-//	osThreadYield();
+	//	uint16_t adc1[4];
+	//	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1,sizeof (adc1));
+	//	HAL_ADC_Start_DMA(hadc, pData, Length)
+	/* Infinite loop */
+	for(;;)
+	{
+		//	HAL_ADC_Stop_DMA(&hadc1);
+		//	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc1,sizeof (adc1));
+		//	adc1 = HAL_ADC_PollForConversion(&hadc1, 5000);
+		//	osMessageQueuePut(QueueDataADCHandle, &adc1, 5000);
+		//	osMessageQueuePut(QueueDataADCHandle, &adc1[0], NULL, 5000);
+		//	osThreadYield();
 
-    osDelay(1000);
-  }
+		osDelay(1000);
+	}
   /* USER CODE END StartADC */
 }
 
 /* USER CODE BEGIN Header_StartEncoders */
 /**
-* @brief Function implementing the Encoders thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the Encoders thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartEncoders */
 void StartEncoders(void *argument)
 {
@@ -812,54 +807,55 @@ void StartEncoders(void *argument)
 
 
 	HAL_TIM_Base_Start_IT(&htim2);
-  /* Infinite loop */
-  for(;;)
-  {
+	/* Infinite loop */
+	for(;;)
+	{
 
-//    Velocidad(ModbusDATA[0]);// Calculo la velocidad para devolver por modbus
-    osDelay(Ts);// Delta T
-    Sentido(ModbusDATA[0]);
+		//    Velocidad(ModbusDATA[0]);// Calculo la velocidad para devolver por modbus
+		osDelay(Ts);// Delta T
+		Sentido(ModbusDATA[0]);
 
-    memcpy(meanData, &deltaTicks, sizeof(deltaTicks));
-    ModbusDATA[4]=meanData[0];
-    ModbusDATA[5]=meanData[1];
+		memcpy(meanData, &deltaTicks, sizeof(deltaTicks));
+		ModbusDATA[4]=meanData[0];
+		ModbusDATA[5]=meanData[1];
 
 
-    memcpy(pasador, &velocidad_prima1, sizeof(velocidad_prima1));
-    ModbusDATA[8]=pasador[0];
-    ModbusDATA[9]=pasador[1];
+		memcpy(pasador, &velocidad_prima1, sizeof(velocidad_prima1));
+		ModbusDATA[8]=pasador[0];
+		ModbusDATA[9]=pasador[1];
 
-    memcpy(delta, &velocidad, sizeof(velocidad));
-    ModbusDATA[10]=delta[0];
-    ModbusDATA[11]=delta[1];
+		memcpy(delta, &velocidad, sizeof(velocidad));
+		ModbusDATA[10]=delta[0];
+		ModbusDATA[11]=delta[1];
 
-    htim1.Instance->CCR1 = ModbusDATA[1];
+		htim1.Instance->CCR1 = ModbusDATA[1];
 
-    ModbusDATA[6] = overflow;
-    if(overflow >= 2){
-    	  velocidad = 0;
-    	  //overflow = 0;
-      }
+		ModbusDATA[6] = overflow;
+		if(overflow >= 2){
+			velocidad = 0;
+			velocidad_prima1 = 0;
+			//overflow = 0;
+		}
 
-  }
+	}
   /* USER CODE END StartEncoders */
 }
 
 /* USER CODE BEGIN Header_StartControl */
 /**
-* @brief Function implementing the Control thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the Control thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartControl */
 void StartControl(void *argument)
 {
   /* USER CODE BEGIN StartControl */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	/* Infinite loop */
+	for(;;)
+	{
+		osDelay(1);
+	}
   /* USER CODE END StartControl */
 }
 
@@ -893,11 +889,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1)
+	{
+	}
   /* USER CODE END Error_Handler_Debug */
 }
 
@@ -912,7 +908,7 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
+	/* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
