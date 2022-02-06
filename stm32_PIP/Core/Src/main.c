@@ -125,7 +125,7 @@ uint32_t ticksNow = 0;
 uint32_t overflow = 0; // Cantidad de desbordes del timer
 uint64_t deltaTicks = 0;
 uint32_t ranuras = 50;
-uint32_t cantTicksTmr2 = 60000;
+uint32_t cantTicksTmr2 = 50000;
 uint64_t fsTmr2= 50000;
 uint64_t tickFilter = 625;
 float mean [50] = {'\0'};
@@ -585,7 +585,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 1440-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 60000-1;
+  htim2.Init.Period = 50000-1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
