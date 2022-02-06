@@ -130,7 +130,7 @@ uint64_t fsTmr2= 50000;
 uint64_t tickFilter = 625;
 float mean [50] = {'\0'};
 float resultMean = 0;
-uint16_t interrupciones=0;
+uint16_t interrupciones=1;
 
 //----------------
 
