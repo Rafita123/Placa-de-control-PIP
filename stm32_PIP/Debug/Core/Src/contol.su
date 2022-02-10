@@ -1,0 +1,2 @@
+contol.c:30:6:contol_step	16	static
+contol.c:49:6:contol_initialize	4	static

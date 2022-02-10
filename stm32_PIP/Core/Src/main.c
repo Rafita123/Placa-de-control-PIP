@@ -28,6 +28,9 @@
 #include "Modbus.h"
 #include "ModbusConfig.h"
 
+#include "contol.h";
+#include "rtwtypes.h";
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -152,10 +155,7 @@ uint16_t interrupciones=1;
 
 
 
-
-
-
-
+contol_initialize();
 
 
 

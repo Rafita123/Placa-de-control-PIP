@@ -41,7 +41,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
- ../Core/Inc/ModbusConfig.h
+ ../Core/Inc/ModbusConfig.h ../Core/Inc/contol.h ../Core/Inc/rtwtypes.h \
+ ../Core/Inc/rtwtypes.h
 
 ../Core/Inc/main.h:
 
@@ -132,3 +133,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 
 ../Core/Inc/ModbusConfig.h:
+
+../Core/Inc/contol.h:
+
+../Core/Inc/rtwtypes.h:
+
+../Core/Inc/rtwtypes.h:
