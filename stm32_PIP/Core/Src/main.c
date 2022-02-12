@@ -155,7 +155,7 @@ uint16_t interrupciones=1;
 
 
 
-contol_initialize();
+
 
 
 
@@ -295,6 +295,9 @@ int main(void)
 	ModbusStart(&ModbusH);
 
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+
+
+	contol_initialize();
   /* USER CODE END 2 */
 
   /* Init scheduler */
