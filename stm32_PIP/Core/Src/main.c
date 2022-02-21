@@ -28,8 +28,9 @@
 #include "Modbus.h"
 #include "ModbusConfig.h"
 
-#include "contol.h";
-#include "rtwtypes.h";
+#include "contol.h"
+#include "contol.c"
+#include "rtwtypes.h"
 
 /* USER CODE END Includes */
 
@@ -48,9 +49,6 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef hadc1;
-DMA_HandleTypeDef hdma_adc1;
-
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 
@@ -99,8 +97,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_TIM1_Init(void);
-static void MX_DMA_Init(void);
-static void MX_ADC1_Init(void);
 static void MX_TIM2_Init(void);
 void StartModbus(void *argument);
 void StartADC(void *argument);
@@ -135,6 +131,11 @@ float mean [50] = {'\0'};
 float resultMean = 0;
 uint16_t interrupciones=1;
 
+float p1[3]={1611,4604,24790};
+float p2[3]={572.6,-1886,-27210};
+uint32_t CCR_obtained=0;
+
+
 //----------------
 
 //float moveMean(float *arr, float vel){
@@ -154,7 +155,23 @@ uint16_t interrupciones=1;
 //}
 
 
+uint32_t funcion_linealizadora(uint16_t velocidadSetpoint){
 
+	float setp = (float)velocidadSetpoint;
+
+	if(setp/100.0 < 0.799034){
+		htim1.Instance->CCR1=(uint32_t)(p1[0]*setp/100.0+p2[0]);
+	}
+
+	if(setp/100.0 > 0.799034 && setp/100.0<=1.23805){
+			htim1.Instance->CCR1=(uint32_t)(p1[1]*setp/100.0+p2[1]);
+		}
+
+	if(setp/100.0 > 1.23805) {
+				htim1.Instance->CCR1=(uint32_t)(p1[2]*setp/100.0+p2[2]);
+			}
+	return htim1.Instance->CCR1;
+}
 
 
 
@@ -274,10 +291,10 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   MX_TIM1_Init();
-  MX_DMA_Init();
-  MX_ADC1_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+
+  contol_initialize();
 
 	// Definiciones para la biblioteca de modbus
 	ModbusH.uModbusType = MB_SLAVE;
@@ -377,7 +394,6 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -406,78 +422,6 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
-/**
-  * @brief ADC1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_ADC1_Init(void)
-{
-
-  /* USER CODE BEGIN ADC1_Init 0 */
-
-  /* USER CODE END ADC1_Init 0 */
-
-  ADC_ChannelConfTypeDef sConfig = {0};
-
-  /* USER CODE BEGIN ADC1_Init 1 */
-
-  /* USER CODE END ADC1_Init 1 */
-  /** Common config
-  */
-  hadc1.Instance = ADC1;
-  hadc1.Init.ScanConvMode = ADC_SCAN_ENABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
-  hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 4;
-  if (HAL_ADC_Init(&hadc1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure Regular Channel
-  */
-  sConfig.Channel = ADC_CHANNEL_0;
-  sConfig.Rank = ADC_REGULAR_RANK_1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure Regular Channel
-  */
-  sConfig.Rank = ADC_REGULAR_RANK_2;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure Regular Channel
-  */
-  sConfig.Rank = ADC_REGULAR_RANK_3;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure Regular Channel
-  */
-  sConfig.Rank = ADC_REGULAR_RANK_4;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN ADC1_Init 2 */
-
-  /* USER CODE END ADC1_Init 2 */
-
 }
 
 /**
@@ -646,22 +590,6 @@ static void MX_USART3_UART_Init(void)
 }
 
 /**
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void)
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
-
-}
-
-/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -693,6 +621,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : D01_Encoder_Pin D02_Enconder_Pin D03_Enconder_Pin D04_Enconder_Pin */
+  GPIO_InitStruct.Pin = D01_Encoder_Pin|D02_Enconder_Pin|D03_Enconder_Pin|D04_Enconder_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
   /*Configure GPIO pins : OUT2_1_Pin OUT2_2_Pin OUT1_2_Pin OUT1_1_Pin
                            OUT3_2_Pin OUT3_1_Pin */
   GPIO_InitStruct.Pin = OUT2_1_Pin|OUT2_2_Pin|OUT1_2_Pin|OUT1_1_Pin
@@ -709,15 +643,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : D01_Encoder_Pin D02_Encoder_Pin D03_Encoder_Pin D04_Encoder_Pin */
-  GPIO_InitStruct.Pin = D01_Encoder_Pin|D02_Encoder_Pin|D03_Encoder_Pin|D04_Encoder_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
-  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI3_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI4_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 
 }
 
@@ -831,7 +768,12 @@ void StartEncoders(void *argument)
 		ModbusDATA[10]=delta[0];
 		ModbusDATA[11]=delta[1];
 
-//		htim1.Instance->CCR1 = ModbusDATA[1];
+		CCR_obtained=funcion_linealizadora(ModbusDATA[1]);
+
+		memcpy(meanData, &CCR_obtained, sizeof(CCR_obtained));
+				ModbusDATA[4]=meanData[0];
+				ModbusDATA[5]=meanData[1];
+
 
 		ModbusDATA[6] = overflow;
 		if(overflow >= 2){
@@ -855,6 +797,7 @@ void StartControl(void *argument)
 {
   /* USER CODE BEGIN StartControl */
 	// Datos de SIMULINK:
+
 	float p = 20;//0.104619555027225;
 	float i = 20.923911005445;
 	float d = 0;
@@ -865,19 +808,23 @@ void StartControl(void *argument)
 	float Y[4] = {0, 0, 0, 0};// Y[0] es la actual
 	float num[] = {0.001474, 0.03026, 0.02879};
 	float den[] = {0.001472, 0.3377, -1.279};
-	float setpoint =(float)ModbusDATA[1]*1.5/10000.0;
+	float setpoint;
 	float entradaPID[2] = {0, 0};
 	float CCR[2] = {0, 0};
+
 
 	/* Infinite loop */
 	for(;;)
 	{
-		osDelay(10);
+		osDelay(50);
 
-//		U[2] = U[1];
-//		U[1] = U[0];
-		setpoint = (float)ModbusDATA[1]*1.5/10000.0; // 0  -> 0 y 10000 -> 1.5 [RPS]
-//
+		U[2] = U[1];
+		U[1] = U[0];
+		setpoint = (float)(ModbusDATA[1]/100.0); // 0  -> 0 y 10000 -> 1.5 [RPS]
+		rtU.Entrada_Control = setpoint-velocidad_prima1;
+		contol_step();
+		CCR_obtained=funcion_linealizadora(rtY.Salida_Control*1.45/25);
+		htim1.Instance->CCR1 = CCR_obtained;
 //		Y[3] = Y[2];
 //		Y[2] = Y[1];
 //		Y[1] = Y[0];// Y es la velocidad y U es el setpoint
@@ -890,11 +837,11 @@ void StartControl(void *argument)
 //		entradaPID[0] = setpoint - Y[0];
 //		CCR[0] = CCR[1] + entradaPID[0]*p;// + entradaPID[1]*(i*T-p);
 
-		CCR[0] = (setpoint-velocidad_prima1)*p;
+		//CCR[0] = (setpoint-velocidad_prima1)*p;
 
 		// 0  -> 0 y 10000 -> 1.5 [RPS]
 //		htim1.Instance->CCR1 = ModbusDATA[1];
-		htim1.Instance->CCR1 = (uint32_t)(CCR[0]*10000.0/1.5);
+		//htim1.Instance->CCR1 = (uint32_t)(CCR[0]*10000.0/1.5);
 	}
   /* USER CODE END StartControl */
 }
@@ -918,6 +865,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 1 */
   if(htim->Instance == TIM2){
 	 overflow += 1;
+	 HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
   }
   /* USER CODE END Callback 1 */
 }

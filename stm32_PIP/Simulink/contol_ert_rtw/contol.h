@@ -3,9 +3,9 @@
  *
  * Code generated for Simulink model 'contol'.
  *
- * Model version                  : 1.3
+ * Model version                  : 1.6
  * Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
- * C/C++ source code generated on : Sat Feb 12 11:58:00 2022
+ * C/C++ source code generated on : Tue Feb 15 20:15:22 2022
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -29,6 +29,7 @@
 /* Block signals and states (default storage) for system '<Root>' */
 typedef struct {
   real_T Integrator_DSTATE;            /* '<S33>/Integrator' */
+  real_T Filter_DSTATE;                /* '<S28>/Filter' */
 } DW;
 
 /* External inputs (root inport signals with default storage) */
@@ -95,22 +96,22 @@ extern void contol_step(void);
  * '<S24>'  : 'contol/PID Controller/postSat Signal'
  * '<S25>'  : 'contol/PID Controller/preSat Signal'
  * '<S26>'  : 'contol/PID Controller/Anti-windup/Passthrough'
- * '<S27>'  : 'contol/PID Controller/D Gain/Disabled'
- * '<S28>'  : 'contol/PID Controller/Filter/Disabled'
- * '<S29>'  : 'contol/PID Controller/Filter ICs/Disabled'
+ * '<S27>'  : 'contol/PID Controller/D Gain/Internal Parameters'
+ * '<S28>'  : 'contol/PID Controller/Filter/Disc. Forward Euler Filter'
+ * '<S29>'  : 'contol/PID Controller/Filter ICs/Internal IC - Filter'
  * '<S30>'  : 'contol/PID Controller/I Gain/Internal Parameters'
  * '<S31>'  : 'contol/PID Controller/Ideal P Gain/Passthrough'
  * '<S32>'  : 'contol/PID Controller/Ideal P Gain Fdbk/Disabled'
  * '<S33>'  : 'contol/PID Controller/Integrator/Discrete'
  * '<S34>'  : 'contol/PID Controller/Integrator ICs/Internal IC'
- * '<S35>'  : 'contol/PID Controller/N Copy/Disabled wSignal Specification'
- * '<S36>'  : 'contol/PID Controller/N Gain/Disabled'
+ * '<S35>'  : 'contol/PID Controller/N Copy/Disabled'
+ * '<S36>'  : 'contol/PID Controller/N Gain/Internal Parameters'
  * '<S37>'  : 'contol/PID Controller/P Copy/Disabled'
  * '<S38>'  : 'contol/PID Controller/Parallel P Gain/Internal Parameters'
  * '<S39>'  : 'contol/PID Controller/Reset Signal/Disabled'
  * '<S40>'  : 'contol/PID Controller/Saturation/Passthrough'
  * '<S41>'  : 'contol/PID Controller/Saturation Fdbk/Disabled'
- * '<S42>'  : 'contol/PID Controller/Sum/Sum_PI'
+ * '<S42>'  : 'contol/PID Controller/Sum/Sum_PID'
  * '<S43>'  : 'contol/PID Controller/Sum Fdbk/Disabled'
  * '<S44>'  : 'contol/PID Controller/Tracking Mode/Disabled'
  * '<S45>'  : 'contol/PID Controller/Tracking Mode Sum/Passthrough'

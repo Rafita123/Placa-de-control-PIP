@@ -18,8 +18,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h \
- ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h \
- ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
@@ -41,8 +39,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
  ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
- ../Core/Inc/ModbusConfig.h ../Core/Inc/contol.h ../Core/Inc/rtwtypes.h \
- ../Core/Inc/rtwtypes.h
+ ../Core/Inc/ModbusConfig.h \
+ D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/contol.h \
+ D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/rtwtypes.h \
+ D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/contol.c \
+ D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/contol.h \
+ D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/rtwtypes.h
 
 ../Core/Inc/main.h:
 
@@ -83,10 +85,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h:
 
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h:
-
-../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc.h:
-
-../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_adc_ex.h:
 
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h:
 
@@ -134,8 +132,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Core/Inc/ModbusConfig.h:
 
-../Core/Inc/contol.h:
+D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/contol.h:
 
-../Core/Inc/rtwtypes.h:
+D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/rtwtypes.h:
 
-../Core/Inc/rtwtypes.h:
+D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/contol.c:
+
+D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/contol.h:
+
+D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/rtwtypes.h:

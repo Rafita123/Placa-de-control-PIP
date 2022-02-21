@@ -62,6 +62,18 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
+#define D01_Encoder_Pin GPIO_PIN_1
+#define D01_Encoder_GPIO_Port GPIOA
+#define D01_Encoder_EXTI_IRQn EXTI1_IRQn
+#define D02_Enconder_Pin GPIO_PIN_2
+#define D02_Enconder_GPIO_Port GPIOA
+#define D02_Enconder_EXTI_IRQn EXTI2_IRQn
+#define D03_Enconder_Pin GPIO_PIN_3
+#define D03_Enconder_GPIO_Port GPIOA
+#define D03_Enconder_EXTI_IRQn EXTI3_IRQn
+#define D04_Enconder_Pin GPIO_PIN_4
+#define D04_Enconder_GPIO_Port GPIOA
+#define D04_Enconder_EXTI_IRQn EXTI4_IRQn
 #define OUT2_1_Pin GPIO_PIN_12
 #define OUT2_1_GPIO_Port GPIOB
 #define OUT2_2_Pin GPIO_PIN_13
@@ -86,18 +98,6 @@ void Error_Handler(void);
 #define OUT3_2_GPIO_Port GPIOB
 #define OUT3_1_Pin GPIO_PIN_4
 #define OUT3_1_GPIO_Port GPIOB
-#define D01_Encoder_Pin GPIO_PIN_6
-#define D01_Encoder_GPIO_Port GPIOB
-#define D01_Encoder_EXTI_IRQn EXTI9_5_IRQn
-#define D02_Encoder_Pin GPIO_PIN_7
-#define D02_Encoder_GPIO_Port GPIOB
-#define D02_Encoder_EXTI_IRQn EXTI9_5_IRQn
-#define D03_Encoder_Pin GPIO_PIN_8
-#define D03_Encoder_GPIO_Port GPIOB
-#define D03_Encoder_EXTI_IRQn EXTI9_5_IRQn
-#define D04_Encoder_Pin GPIO_PIN_9
-#define D04_Encoder_GPIO_Port GPIOB
-#define D04_Encoder_EXTI_IRQn EXTI9_5_IRQn
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

@@ -3,9 +3,9 @@
  *
  * Code generated for Simulink model 'contol'.
  *
- * Model version                  : 1.3
+ * Model version                  : 1.6
  * Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
- * C/C++ source code generated on : Sat Feb 12 11:58:00 2022
+ * C/C++ source code generated on : Tue Feb 15 20:15:22 2022
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -29,20 +29,36 @@ ExtY rtY;
 /* Model step function */
 void contol_step(void)
 {
+  real_T rtb_FilterCoefficient;
+  real_T rtb_Gain;
+
+  /* Gain: '<Root>/Gain' incorporates:
+   *  Inport: '<Root>/Entrada_Control'
+   */
+  rtb_Gain = 6.28 * rtU.Entrada_Control;
+
+  /* Gain: '<S36>/Filter Coefficient' incorporates:
+   *  DiscreteIntegrator: '<S28>/Filter'
+   *  Gain: '<S27>/Derivative Gain'
+   *  Sum: '<S28>/SumD'
+   */
+  rtb_FilterCoefficient = (2 * rtb_Gain - rtDW.Filter_DSTATE) * 100.0; // kd
+
   /* Outport: '<Root>/Salida_Control' incorporates:
    *  DiscreteIntegrator: '<S33>/Integrator'
    *  Gain: '<S38>/Proportional Gain'
-   *  Inport: '<Root>/Entrada_Control'
    *  Sum: '<S42>/Sum'
    */
-  rtY.Salida_Control = 0.124114887495952 * rtU.Entrada_Control +
-    rtDW.Integrator_DSTATE;
+  rtY.Salida_Control = (550 * rtb_Gain + rtDW.Integrator_DSTATE) +
+    rtb_FilterCoefficient; //ki
 
   /* Update for DiscreteIntegrator: '<S33>/Integrator' incorporates:
    *  Gain: '<S30>/Integral Gain'
-   *  Inport: '<Root>/Entrada_Control'
    */
-  rtDW.Integrator_DSTATE += 24.8229774991904 * rtU.Entrada_Control * 0.01;
+  rtDW.Integrator_DSTATE += 300 * rtb_Gain * 0.01;//k
+
+  /* Update for DiscreteIntegrator: '<S28>/Filter' */
+  rtDW.Filter_DSTATE += 0.01 * rtb_FilterCoefficient;
 }
 
 /* Model initialize function */
