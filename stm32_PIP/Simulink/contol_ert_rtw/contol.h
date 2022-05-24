@@ -3,9 +3,9 @@
  *
  * Code generated for Simulink model 'contol'.
  *
- * Model version                  : 1.6
+ * Model version                  : 1.8
  * Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
- * C/C++ source code generated on : Tue Feb 15 20:15:22 2022
+ * C/C++ source code generated on : Thu Mar 10 16:01:29 2022
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -26,34 +26,17 @@
 
 /* Macros for accessing real-time model data structure */
 
-/* Block signals and states (default storage) for system '<Root>' */
-typedef struct {
-  real_T Integrator_DSTATE;            /* '<S33>/Integrator' */
-  real_T Filter_DSTATE;                /* '<S28>/Filter' */
-} DW;
-
-/* External inputs (root inport signals with default storage) */
-typedef struct {
-  real_T Entrada_Control;              /* '<Root>/Entrada_Control' */
-} ExtU;
-
-/* External outputs (root outports fed by signals with default storage) */
-typedef struct {
-  real_T Salida_Control;               /* '<Root>/Salida_Control' */
-} ExtY;
-
-/* Block signals and states (default storage) */
-extern DW rtDW;
-
-/* External inputs (root inport signals with default storage) */
-extern ExtU rtU;
-
-/* External outputs (root outports fed by signals with default storage) */
-extern ExtY rtY;
-
 /* Model entry point functions */
 extern void contol_initialize(void);
 extern void contol_step(void);
+
+/* Exported data declaration */
+
+/* Data with Exported storage */
+extern real_T rtEntrada_Control;       /* '<Root>/Entrada_Control' */
+extern real_T rtFilter_DSTATE;         /* '<S28>/Filter' */
+extern real_T rtIntegrator_DSTATE;     /* '<S33>/Integrator' */
+extern real_T rtSalida_Control;        /* '<Root>/Salida_Control' */
 
 /*-
  * The generated code includes comments that allow you to trace directly

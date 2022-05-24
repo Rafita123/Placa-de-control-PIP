@@ -1,0 +1,5 @@
+#D:\Facu\Facultad\Tesis\codes\Main code\Placa-de-control-PIP\stm32_PIP\Simulink\contol_autosar_rtw\stub\Rte_contol.h
+#this file contains the list of RTE methods that the profiling must filter out
+-Rte_IRead_contol_Step_Entrada_Control_Entrada_Control
+-Rte_IWrite_contol_Step_Salida_Control_Salida_Control
+-Rte_IWriteRef_contol_Step_Salida_Control_Salida_Control

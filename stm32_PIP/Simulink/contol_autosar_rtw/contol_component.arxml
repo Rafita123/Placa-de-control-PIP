@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Auto generated XML Component Description for model contol
+Model version                : 1.7
+Simulink Coder version       : Simulink Coder 9.5 (R2021a) 14-Nov-2020
+XML source code generated on : Sat Mar 05 11:08:16 2022
+Model Checksum               : 2374467654 4216545588 2657797453 2983380042
+-->
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://autosar.org/schema/r4.0 AUTOSAR_4-3-1.xsd">
+    <AR-PACKAGES>
+        <AR-PACKAGE>
+            <SHORT-NAME>Components</SHORT-NAME>
+            <ELEMENTS>
+                <APPLICATION-SW-COMPONENT-TYPE UUID="12cb5e6c-378b-552f-d158-8ee90bdabff8">
+                    <SHORT-NAME>contol</SHORT-NAME>
+                    <PORTS>
+                        <R-PORT-PROTOTYPE UUID="8cdabd1a-3a17-59e1-0fbd-2a79eeff70c0">
+                            <SHORT-NAME>Entrada_Control</SHORT-NAME>
+                            <REQUIRED-COM-SPECS>
+                                <NONQUEUED-RECEIVER-COM-SPEC>
+                                    <DATA-ELEMENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/Interfaces/Entrada_Control/Entrada_Control</DATA-ELEMENT-REF>
+                                    <HANDLE-OUT-OF-RANGE>NONE</HANDLE-OUT-OF-RANGE>
+                                    <USES-END-TO-END-PROTECTION>false</USES-END-TO-END-PROTECTION>
+                                    <ALIVE-TIMEOUT>0</ALIVE-TIMEOUT>
+                                    <ENABLE-UPDATE>false</ENABLE-UPDATE>
+                                    <HANDLE-NEVER-RECEIVED>false</HANDLE-NEVER-RECEIVED>
+                                    <HANDLE-TIMEOUT-TYPE>NONE</HANDLE-TIMEOUT-TYPE>
+                                    <INIT-VALUE>
+                                        <NUMERICAL-VALUE-SPECIFICATION>
+                                            <SHORT-LABEL>DefaultInitValue_Double</SHORT-LABEL>
+                                            <VALUE>0</VALUE>
+                                        </NUMERICAL-VALUE-SPECIFICATION>
+                                    </INIT-VALUE>
+                                </NONQUEUED-RECEIVER-COM-SPEC>
+                            </REQUIRED-COM-SPECS>
+                            <REQUIRED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/Entrada_Control</REQUIRED-INTERFACE-TREF>
+                        </R-PORT-PROTOTYPE>
+                        <P-PORT-PROTOTYPE UUID="4249f344-9a14-5d65-21ec-23041e5be116">
+                            <SHORT-NAME>Salida_Control</SHORT-NAME>
+                            <PROVIDED-COM-SPECS>
+                                <NONQUEUED-SENDER-COM-SPEC>
+                                    <DATA-ELEMENT-REF DEST="VARIABLE-DATA-PROTOTYPE">/Interfaces/Salida_Control/Salida_Control</DATA-ELEMENT-REF>
+                                    <HANDLE-OUT-OF-RANGE>NONE</HANDLE-OUT-OF-RANGE>
+                                    <USES-END-TO-END-PROTECTION>false</USES-END-TO-END-PROTECTION>
+                                    <INIT-VALUE>
+                                        <NUMERICAL-VALUE-SPECIFICATION>
+                                            <SHORT-LABEL>DefaultInitValue_Double</SHORT-LABEL>
+                                            <VALUE>0</VALUE>
+                                        </NUMERICAL-VALUE-SPECIFICATION>
+                                    </INIT-VALUE>
+                                </NONQUEUED-SENDER-COM-SPEC>
+                            </PROVIDED-COM-SPECS>
+                            <PROVIDED-INTERFACE-TREF DEST="SENDER-RECEIVER-INTERFACE">/Interfaces/Salida_Control</PROVIDED-INTERFACE-TREF>
+                        </P-PORT-PROTOTYPE>
+                    </PORTS>
+                    <INTERNAL-BEHAVIORS>
+                        <SWC-INTERNAL-BEHAVIOR UUID="67de2832-2b9b-5aee-af31-4725c3c03e31">
+                            <SHORT-NAME>contol_IB</SHORT-NAME>
+                            <EVENTS>
+                                <TIMING-EVENT UUID="345ba5d1-105c-5dea-129b-470db4ae99c3">
+                                    <SHORT-NAME>Event_contol_Step</SHORT-NAME>
+                                    <START-ON-EVENT-REF DEST="RUNNABLE-ENTITY">/Components/contol/contol_IB/contol_Step</START-ON-EVENT-REF>
+                                    <PERIOD>0.1</PERIOD>
+                                </TIMING-EVENT>
+                            </EVENTS>
+                            <HANDLE-TERMINATION-AND-RESTART>NO-SUPPORT</HANDLE-TERMINATION-AND-RESTART>
+                            <RUNNABLES>
+                                <RUNNABLE-ENTITY UUID="6c05cb36-2e92-5479-92e0-af006c3817a3">
+                                    <SHORT-NAME>contol_Init</SHORT-NAME>
+                                    <MINIMUM-START-INTERVAL>0</MINIMUM-START-INTERVAL>
+                                    <CAN-BE-INVOKED-CONCURRENTLY>false</CAN-BE-INVOKED-CONCURRENTLY>
+                                    <SYMBOL>contol_Init</SYMBOL>
+                                </RUNNABLE-ENTITY>
+                                <RUNNABLE-ENTITY UUID="8cf8bcfa-6f7e-5288-9d5b-738fc021da8a">
+                                    <SHORT-NAME>contol_Step</SHORT-NAME>
+                                    <MINIMUM-START-INTERVAL>0</MINIMUM-START-INTERVAL>
+                                    <CAN-BE-INVOKED-CONCURRENTLY>false</CAN-BE-INVOKED-CONCURRENTLY>
+                                    <DATA-READ-ACCESSS>
+                                        <VARIABLE-ACCESS UUID="b759a9c2-6187-5b06-247d-35732f0f0932">
+                                            <SHORT-NAME>IN_Entrada_Control_Entrada_Control</SHORT-NAME>
+                                            <ACCESSED-VARIABLE>
+                                                <AUTOSAR-VARIABLE-IREF>
+                                                    <PORT-PROTOTYPE-REF DEST="R-PORT-PROTOTYPE">/Components/contol/Entrada_Control</PORT-PROTOTYPE-REF>
+                                                    <TARGET-DATA-PROTOTYPE-REF DEST="VARIABLE-DATA-PROTOTYPE">/Interfaces/Entrada_Control/Entrada_Control</TARGET-DATA-PROTOTYPE-REF>
+                                                </AUTOSAR-VARIABLE-IREF>
+                                            </ACCESSED-VARIABLE>
+                                        </VARIABLE-ACCESS>
+                                    </DATA-READ-ACCESSS>
+                                    <DATA-WRITE-ACCESSS>
+                                        <VARIABLE-ACCESS UUID="89572138-c717-5056-e176-3fa5066f317a">
+                                            <SHORT-NAME>OUT_Salida_Control_Salida_Control</SHORT-NAME>
+                                            <ACCESSED-VARIABLE>
+                                                <AUTOSAR-VARIABLE-IREF>
+                                                    <PORT-PROTOTYPE-REF DEST="P-PORT-PROTOTYPE">/Components/contol/Salida_Control</PORT-PROTOTYPE-REF>
+                                                    <TARGET-DATA-PROTOTYPE-REF DEST="VARIABLE-DATA-PROTOTYPE">/Interfaces/Salida_Control/Salida_Control</TARGET-DATA-PROTOTYPE-REF>
+                                                </AUTOSAR-VARIABLE-IREF>
+                                            </ACCESSED-VARIABLE>
+                                        </VARIABLE-ACCESS>
+                                    </DATA-WRITE-ACCESSS>
+                                    <SYMBOL>contol_Step</SYMBOL>
+                                </RUNNABLE-ENTITY>
+                            </RUNNABLES>
+                            <SUPPORTS-MULTIPLE-INSTANTIATION>false</SUPPORTS-MULTIPLE-INSTANTIATION>
+                        </SWC-INTERNAL-BEHAVIOR>
+                    </INTERNAL-BEHAVIORS>
+                </APPLICATION-SW-COMPONENT-TYPE>
+            </ELEMENTS>
+        </AR-PACKAGE>
+    </AR-PACKAGES>
+</AUTOSAR>

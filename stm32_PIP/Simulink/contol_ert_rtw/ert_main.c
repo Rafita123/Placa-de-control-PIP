@@ -3,9 +3,9 @@
  *
  * Code generated for Simulink model 'contol'.
  *
- * Model version                  : 1.6
+ * Model version                  : 1.8
  * Simulink Coder version         : 9.5 (R2021a) 14-Nov-2020
- * C/C++ source code generated on : Tue Feb 15 20:15:22 2022
+ * C/C++ source code generated on : Thu Mar 10 16:01:29 2022
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex-M
@@ -78,7 +78,7 @@ int_T main(int_T argc, const char *argv[])
   contol_initialize();
 
   /* Attach rt_OneStep to a timer or interrupt service routine with
-   * period 0.01 seconds (the model's base sample time) here.  The
+   * period 0.05 seconds (the model's base sample time) here.  The
    * call syntax for rt_OneStep is
    *
    *  rt_OneStep();

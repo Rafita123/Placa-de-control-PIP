@@ -44,7 +44,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/rtwtypes.h \
  D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/contol.c \
  D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/contol.h \
- D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/rtwtypes.h
+ D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/Subsystem_ert_rtw/Subsystem.c \
+ D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/Subsystem_ert_rtw/Subsystem.h \
+ D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/Subsystem_ert_rtw/rtwtypes.h \
+ D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/Subsystem_ert_rtw/Subsystem.h
 
 ../Core/Inc/main.h:
 
@@ -140,4 +143,10 @@ D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/
 
 D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/contol.h:
 
-D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/contol_ert_rtw/rtwtypes.h:
+D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/Subsystem_ert_rtw/Subsystem.c:
+
+D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/Subsystem_ert_rtw/Subsystem.h:
+
+D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/Subsystem_ert_rtw/rtwtypes.h:
+
+D:/Facu/Facultad/Tesis/codes/Main\ code/Placa-de-control-PIP/stm32_PIP/Simulink/Subsystem_ert_rtw/Subsystem.h:

@@ -49,6 +49,7 @@
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2"/>
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3"/>
 									<listOptionValue builtIn="false" value="&quot;D:\Facu\Facultad\Tesis\codes\Main code\Placa-de-control-PIP\stm32_PIP\Simulink\contol_ert_rtw&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;D:\Facu\Facultad\Tesis\codes\Main code\Placa-de-control-PIP\stm32_PIP\Simulink\Subsystem_ert_rtw&quot;"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1228914320" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>

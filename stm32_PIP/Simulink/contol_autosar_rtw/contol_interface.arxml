@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Auto generated XML Component Description for model contol
+Model version                : 1.7
+Simulink Coder version       : Simulink Coder 9.5 (R2021a) 14-Nov-2020
+XML source code generated on : Sat Mar 05 11:08:16 2022
+Model Checksum               : 2374467654 4216545588 2657797453 2983380042
+-->
+<AUTOSAR xmlns="http://autosar.org/schema/r4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://autosar.org/schema/r4.0 AUTOSAR_4-3-1.xsd">
+    <AR-PACKAGES>
+        <AR-PACKAGE>
+            <SHORT-NAME>Interfaces</SHORT-NAME>
+            <ELEMENTS>
+                <SENDER-RECEIVER-INTERFACE UUID="308a4ad1-21f4-541c-1d99-143669c0c9ee">
+                    <SHORT-NAME>Entrada_Control</SHORT-NAME>
+                    <IS-SERVICE>false</IS-SERVICE>
+                    <DATA-ELEMENTS>
+                        <VARIABLE-DATA-PROTOTYPE UUID="d834a07c-ade7-5e81-b1bf-cf94eb6940c4">
+                            <SHORT-NAME>Entrada_Control</SHORT-NAME>
+                            <CATEGORY>VALUE</CATEGORY>
+                            <SW-DATA-DEF-PROPS>
+                                <SW-DATA-DEF-PROPS-VARIANTS>
+                                    <SW-DATA-DEF-PROPS-CONDITIONAL>
+                                        <SW-CALIBRATION-ACCESS>READ-ONLY</SW-CALIBRATION-ACCESS>
+                                        <SW-IMPL-POLICY>STANDARD</SW-IMPL-POLICY>
+                                    </SW-DATA-DEF-PROPS-CONDITIONAL>
+                                </SW-DATA-DEF-PROPS-VARIANTS>
+                            </SW-DATA-DEF-PROPS>
+                            <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/DataTypes/Double</TYPE-TREF>
+                        </VARIABLE-DATA-PROTOTYPE>
+                    </DATA-ELEMENTS>
+                </SENDER-RECEIVER-INTERFACE>
+                <SENDER-RECEIVER-INTERFACE UUID="62f9ee0f-ab64-5ce5-c3a7-c4713bb502d9">
+                    <SHORT-NAME>Salida_Control</SHORT-NAME>
+                    <IS-SERVICE>false</IS-SERVICE>
+                    <DATA-ELEMENTS>
+                        <VARIABLE-DATA-PROTOTYPE UUID="5ba8f0e3-034b-5315-87b1-9efdff955976">
+                            <SHORT-NAME>Salida_Control</SHORT-NAME>
+                            <CATEGORY>VALUE</CATEGORY>
+                            <SW-DATA-DEF-PROPS>
+                                <SW-DATA-DEF-PROPS-VARIANTS>
+                                    <SW-DATA-DEF-PROPS-CONDITIONAL>
+                                        <SW-CALIBRATION-ACCESS>READ-ONLY</SW-CALIBRATION-ACCESS>
+                                        <SW-IMPL-POLICY>STANDARD</SW-IMPL-POLICY>
+                                    </SW-DATA-DEF-PROPS-CONDITIONAL>
+                                </SW-DATA-DEF-PROPS-VARIANTS>
+                            </SW-DATA-DEF-PROPS>
+                            <TYPE-TREF DEST="IMPLEMENTATION-DATA-TYPE">/DataTypes/Double</TYPE-TREF>
+                        </VARIABLE-DATA-PROTOTYPE>
+                    </DATA-ELEMENTS>
+                </SENDER-RECEIVER-INTERFACE>
+            </ELEMENTS>
+        </AR-PACKAGE>
+    </AR-PACKAGES>
+</AUTOSAR>

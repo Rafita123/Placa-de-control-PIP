@@ -30,7 +30,9 @@
 
 #include "contol.h"
 #include "contol.c"
-#include "rtwtypes.h"
+
+#include "Subsystem.c"
+#include "Subsystem.h"
 
 /* USER CODE END Includes */
 
@@ -798,19 +800,19 @@ void StartControl(void *argument)
   /* USER CODE BEGIN StartControl */
 	// Datos de SIMULINK:
 
-	float p = 20;//0.104619555027225;
-	float i = 20.923911005445;
-	float d = 0;
-	float N = 100;
-	float T = 0.01;
-//	float setPoint = (float)ModbusDATA[1]*1.5/10000.0; // 0  - 0 y 10000 - 1.5 [RPS]
+//	float p = 20;//0.104619555027225;
+//	float i = 20.923911005445;
+//	float d = 0;
+//	float N = 100;
+//	float T = 0.01;
+////	float setPoint = (float)ModbusDATA[1]*1.5/10000.0; // 0  - 0 y 10000 - 1.5 [RPS]
 	float U[3] = {0, 0 ,0};// U[0] es la actual
-	float Y[4] = {0, 0, 0, 0};// Y[0] es la actual
-	float num[] = {0.001474, 0.03026, 0.02879};
-	float den[] = {0.001472, 0.3377, -1.279};
+//	float Y[4] = {0, 0, 0, 0};// Y[0] es la actual
+//	float num[] = {0.001474, 0.03026, 0.02879};
+//	float den[] = {0.001472, 0.3377, -1.279};
 	float setpoint;
-	float entradaPID[2] = {0, 0};
-	float CCR[2] = {0, 0};
+//	float entradaPID[2] = {0, 0};
+//	float CCR[2] = {0, 0};
 
 
 	/* Infinite loop */
@@ -821,9 +823,9 @@ void StartControl(void *argument)
 		U[2] = U[1];
 		U[1] = U[0];
 		setpoint = (float)(ModbusDATA[1]/100.0); // 0  -> 0 y 10000 -> 1.5 [RPS]
-		rtU.Entrada_Control = setpoint-velocidad_prima1;
+		rtEntrada_Control = setpoint-velocidad_prima1;
 		contol_step();
-		CCR_obtained=funcion_linealizadora(rtY.Salida_Control*1.45/25);
+		CCR_obtained=funcion_linealizadora(rtSalida_Control);
 		htim1.Instance->CCR1 = CCR_obtained;
 //		Y[3] = Y[2];
 //		Y[2] = Y[1];
